@@ -3,7 +3,6 @@ package gorpc
 import (
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/golang/protobuf/protoc-gen-go/generator"
-	"github.com/pkg/errors"
 )
 
 // buildFileDescriptor 构建一个更简单的FileDescriptor对象，指导代码生成
@@ -50,7 +49,7 @@ func buildFileDescriptor(fd *generator.FileDescriptor) (nfd *FileDescriptor, err
 func buildOptions(fopts *descriptor.FileOptions) (map[string]interface{}, error) {
 
 	if fopts == nil {
-		return nil, errors.New("*descriptor.FileOptions nil")
+		return nil, nil
 	}
 
 	m := map[string]interface{}{}

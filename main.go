@@ -54,6 +54,8 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/protoc-gen-go/generator"
+
+	_ "github.com/hitzhangjie/protoc-gen-gorpc/gorpc"
 )
 
 func main() {
