@@ -38,8 +38,13 @@ package gorpc
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
+	"text/template"
+
+	"github.com/hitzhangjie/protoc-gen-gorpc/utils/fs"
 
 	pb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/golang/protobuf/protoc-gen-go/generator"
@@ -111,27 +116,89 @@ func (g *gorpc) Generate(file *generator.FileDescriptor) {
 		return
 	}
 
-	// todo fullfill the desc
+	// todo build the FileDescriptor
+	nfd, err := buildFileDescriptor(file)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "buildFileDescriptor error: %v", err)
+		os.Exit(1)
+	}
 
 	// todo run go template to generate template
+	root := "/Users/zhangjie/Github/protoc-gen-gorpc/install"
+	tmpdir := os.TempDir()
 
-	//contextPkg = string(g.gen.AddImport(contextPkgPath))
-	//gorpcPkg = string(g.gen.AddImport(gorpcPkgPath))
-	//
-	//g.P("// Reference imports to suppress errors if they are not otherwise used.")
-	//g.P("var _ ", contextPkg, ".Context")
-	//g.P("var _ ", gorpcPkg, ".ClientConn")
-	//g.P()
-	//
-	//// Assert version compatibility.
-	//g.P("// This is a compile-time assertion to ensure that this generated file")
-	//g.P("// is compatible with the gorpc package it is being compiled against.")
-	//g.P("const _ = ", gorpcPkg, ".SupportPackageIsVersion", generatedCodeVersion)
-	//g.P()
-	//
-	//for i, service := range file.FileDescriptorProto.Service {
-	//	g.generateService(file, service, i)
-	//}
+	filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+
+		// 检查要不要处理当前文件
+		if err != nil {
+			return err
+		}
+
+		if path == "." || path == ".." {
+			return nil
+		}
+
+		var target string
+
+		// 新生成文件目录结构，与模板路径保持一样的结构
+		if rel, err := filepath.Rel(path, root); err != nil {
+			return err
+		} else {
+			target = filepath.Join(tmpdir, rel)
+		}
+
+		// 如果是文件，且为go模板文件，执行go模板引擎生成新文件
+		if !info.IsDir() {
+
+			// 非模板文件，直接copy
+			if !strings.HasSuffix(path, ".tpl") {
+				fs.Copy(path, target)
+			}
+
+			// 模板文件，执行模板处理引擎
+			if err = processTemplateFile(path, target, nfd); err != nil {
+				return err
+			}
+			return nil
+		}
+
+		if err = os.MkdirAll(target, os.ModePerm); err != nil {
+			return err
+		}
+		return nil
+	})
+
+}
+
+func processTemplateFile(inFile, outFile string, nfd *FileDescriptor) error {
+
+	baseName := filepath.Base(inFile)
+
+	var (
+		instance *template.Template
+		err      error
+		fout     *os.File
+	)
+
+	if funcMap == nil {
+		instance, err = template.New(baseName).ParseFiles(inFile)
+	} else {
+		instance, err = template.New(baseName).Funcs(funcMap).ParseFiles(inFile)
+	}
+
+	if err != nil {
+		return err
+	}
+
+	if fout, err = os.Create(outFile); err != nil {
+		return err
+	}
+	defer fout.Close()
+
+	if err = instance.Execute(fout, nfd); err != nil {
+		return err
+	}
+	return nil
 }
 
 // GenerateImports generates the import declaration for this file.
