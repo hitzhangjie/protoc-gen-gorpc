@@ -49,8 +49,11 @@
 package main
 
 import (
+	"flag"
 	"io/ioutil"
+	"log"
 	"os"
+	"runtime"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/protoc-gen-go/generator"
@@ -58,7 +61,24 @@ import (
 	_ "github.com/hitzhangjie/protoc-gen-gorpc/gorpc"
 )
 
+var (
+	debug = flag.Bool("debug", false, "debug")
+)
+
+func init() {
+
+	flag.Parse()
+	log.SetFlags(log.Lshortfile)
+}
+
 func main() {
+
+	// if want to debug this protoc plugin, we'd better let the debugger attach to it before
+	// the execution of plugin logic.
+	for *debug {
+		runtime.Gosched()
+	}
+
 	// Begin by allocating a generator. The request and response structures are stored there
 	// so we can do error handling easily - the response structure contains the field to
 	// report failure.
