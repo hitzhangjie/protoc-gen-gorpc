@@ -49,11 +49,11 @@
 package main
 
 import (
-	"flag"
 	"io/ioutil"
 	"log"
 	"os"
 	"runtime"
+	"strconv"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/protoc-gen-go/generator"
@@ -61,23 +61,11 @@ import (
 	_ "github.com/hitzhangjie/protoc-gen-gorpc/gorpc"
 )
 
-var (
-	debug = flag.Bool("debug", false, "debug")
-)
-
 func init() {
-
-	flag.Parse()
 	log.SetFlags(log.Lshortfile)
 }
 
 func main() {
-
-	// if want to debug this protoc plugin, we'd better let the debugger attach to it before
-	// the execution of plugin logic.
-	for *debug {
-		runtime.Gosched()
-	}
 
 	// Begin by allocating a generator. The request and response structures are stored there
 	// so we can do error handling easily - the response structure contains the field to
@@ -98,6 +86,16 @@ func main() {
 	}
 
 	g.CommandLineParameters(g.Request.GetParameter())
+
+	// if want to debug this protoc plugin, we'd better let the debugger attach to it before
+	// the execution of plugin logic.
+	if v, ok := g.Param["debug"]; ok && len(v) != 0 {
+		if debug, err := strconv.ParseBool(v); err == nil {
+			for debug {
+				runtime.Gosched()
+			}
+		}
+	}
 
 	// Create a wrapped version of the Descriptors and EnumDescriptors that
 	// point to the file that defines them.
