@@ -91,6 +91,9 @@ func main() {
 	// the execution of plugin logic.
 	if v, ok := g.Param["debug"]; ok && len(v) != 0 {
 		if debug, err := strconv.ParseBool(v); err == nil {
+			if debug {
+				log.Printf("protoc-gen-gorpc pid: %d, ready to pause", os.Getpid())
+			}
 			for debug {
 				runtime.Gosched()
 			}
