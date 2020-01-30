@@ -40,6 +40,7 @@ func BuildFileDescriptor(fd *FileDescriptor) (nfd *gorpc.FileDescriptor, err err
 			}
 			srv.RPC = append(srv.RPC, rpc)
 		}
+		nfd.Services = append(nfd.Services, srv)
 	}
 
 	return nfd, nil

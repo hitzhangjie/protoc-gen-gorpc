@@ -1137,61 +1137,71 @@ func (g *Generator) GenerateTplFiles() error {
 // generateTplFile process the go template files
 func (g *Generator) generateTplFile(file *FileDescriptor) error {
 
+	if len(file.FileDescriptorProto.Service) == 0 {
+		return errors.New("No RPC Service defined")
+	}
+
+	// 准备模板变量信息
 	nfd, err := BuildFileDescriptor(file)
 	if err != nil {
 		return err
 	}
 
-	if len(file.FileDescriptorProto.Service) == 0 {
-		return errors.New("No RPC Service defined")
+	// run go template to generate template
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return err
+	}
+	root := filepath.Join(home, ".gorpc2/go")
+
+	wd, err := os.Getwd()
+	if err != nil {
+		return err
 	}
 
-	// todo run go template to generate template
-	root := "/Users/zhangjie/Github/protoc-gen-gorpc/install"
-	tmpdir := os.TempDir()
+	baseName := filepath.Base(file.GetName())
+	fileName := strings.TrimSuffix(baseName, filepath.Ext(baseName))
+	output := filepath.Join(wd, fileName)
+	os.MkdirAll(output, os.ModePerm)
 
-	err = filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
-
+	fn := func(path string, info os.FileInfo, err error) error {
 		// 检查要不要处理当前文件
 		if err != nil {
 			return err
 		}
 
-		if path == "." || path == ".." {
+		// 新生成文件目录结构，与模板路径保持一样的结构
+		var (
+			target string
+			rel    string
+		)
+
+		rel, err = filepath.Rel(path, root)
+		if err != nil {
+			return err
+		}
+		if rel == "." || rel == ".." {
 			return nil
 		}
 
-		var target string
-
-		// 新生成文件目录结构，与模板路径保持一样的结构
-		if rel, err := filepath.Rel(path, root); err != nil {
-			return err
-		} else {
-			target = filepath.Join(tmpdir, rel)
+		// 如果是目录，按照原目录结构创建目录
+		if info.IsDir() {
+			target = filepath.Join(output, rel)
+			return os.MkdirAll(target, os.ModePerm)
 		}
 
 		// 如果是文件，且为go模板文件，执行go模板引擎生成新文件
-		if !info.IsDir() {
-
-			// 非模板文件，直接copy
-			if !strings.HasSuffix(path, ".tpl") {
-				fs.Copy(path, target)
-			}
-
-			// 模板文件，执行模板处理引擎
-			if err = g.procTplFile(path, target, nfd); err != nil {
-				return err
-			}
-			return nil
+		// - 模板文件，执行模板处理引擎
+		if strings.HasSuffix(path, ".tpl") {
+			rel = strings.TrimSuffix(rel, ".tpl") + ".go"
+			target = filepath.Join(output, rel)
+			return g.procTplFile(path, target, nfd)
 		}
+		// - 非模板文件，直接copy
+		return fs.Copy(path, target)
+	}
 
-		if err = os.MkdirAll(target, os.ModePerm); err != nil {
-			return err
-		}
-		return nil
-	})
-
-	return err
+	return filepath.Walk(root, fn)
 }
 
 func (g *Generator) procTplFile(inFile, outFile string, nfd *gorpc.FileDescriptor) error {
