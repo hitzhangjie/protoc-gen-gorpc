@@ -1124,8 +1124,18 @@ func (g *Generator) runPlugins(file *FileDescriptor) {
 	}
 }
 
-// ProcGoTemplate process the go template files
-func (g *Generator) ProcGoTemplate(file *FileDescriptor) error {
+//
+func (g *Generator) GenerateTplFiles() error {
+	for _, file := range g.allFiles {
+		if err := g.generateTplFile(file); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// generateTplFile process the go template files
+func (g *Generator) generateTplFile(file *FileDescriptor) error {
 
 	nfd, err := BuildFileDescriptor(file)
 	if err != nil {
@@ -1169,7 +1179,7 @@ func (g *Generator) ProcGoTemplate(file *FileDescriptor) error {
 			}
 
 			// 模板文件，执行模板处理引擎
-			if err = g.procTemplateFile(path, target, nfd); err != nil {
+			if err = g.procTplFile(path, target, nfd); err != nil {
 				return err
 			}
 			return nil
@@ -1184,7 +1194,7 @@ func (g *Generator) ProcGoTemplate(file *FileDescriptor) error {
 	return err
 }
 
-func (g *Generator) procTemplateFile(inFile, outFile string, nfd *gorpc.FileDescriptor) error {
+func (g *Generator) procTplFile(inFile, outFile string, nfd *gorpc.FileDescriptor) error {
 
 	baseName := filepath.Base(inFile)
 

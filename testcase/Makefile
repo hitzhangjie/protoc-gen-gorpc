@@ -1,5 +1,5 @@
 all: *.proto
-	protoc --gorpc_out=plugins=gorpc:. hello.proto
+	protoc --gorpc_out=. hello.proto
 
 .PHONY: clean
 

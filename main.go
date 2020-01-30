@@ -56,9 +56,7 @@ import (
 	"strconv"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/protoc-gen-go/generator"
-
-	_ "github.com/hitzhangjie/protoc-gen-gorpc/gorpc"
+	"github.com/hitzhangjie/protoc-gen-gorpc/generator"
 )
 
 func init() {
@@ -107,6 +105,7 @@ func main() {
 	g.SetPackageNames()
 	g.BuildTypeNameMap()
 
+	// 1. 生成*.pb.go文件，删除了grpc插件相关代码逻辑
 	g.GenerateAllFiles()
 
 	// Send back the results.
@@ -117,5 +116,11 @@ func main() {
 	_, err = os.Stdout.Write(data)
 	if err != nil {
 		g.Error(err, "failed to write output proto")
+	}
+
+	// 2. 生成自定义模板相关文件
+	err = g.GenerateTplFiles()
+	if err != nil  {
+		g.Error(err, "failed to process template files")
 	}
 }
