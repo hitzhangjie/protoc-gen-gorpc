@@ -5,8 +5,8 @@ import (
 	"github.com/hitzhangjie/protoc-gen-gorpc/gorpc"
 )
 
-// BuildFileDescriptor 构建一个更简单的FileDescriptor对象，指导代码生成
-func BuildFileDescriptor(fd *FileDescriptor) (nfd *gorpc.FileDescriptor, err error) {
+// convertFileDescriptor 构建一个更简单的FileDescriptor对象，指导代码生成
+func convertFileDescriptor(fd *FileDescriptor) (nfd *gorpc.FileDescriptor, err error) {
 
 	opts, err := buildOptions(fd.GetOptions())
 	if err != nil {
