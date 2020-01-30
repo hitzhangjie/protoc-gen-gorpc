@@ -58,10 +58,9 @@ import (
 	"unicode/utf8"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/protoc-gen-go/generator/internal/remap"
-
-	"github.com/golang/protobuf/protoc-gen-go/descriptor"
-	plugin "github.com/golang/protobuf/protoc-gen-go/plugin"
+	"github.com/hitzhangjie/protoc-gen-gorpc/descriptor"
+	"github.com/hitzhangjie/protoc-gen-gorpc/generator/internal/remap"
+	plugin "github.com/hitzhangjie/protoc-gen-gorpc/plugin"
 )
 
 // generatedCodeVersion indicates a version of the generated code.
@@ -2264,7 +2263,7 @@ func (g *Generator) generateMessage(message *Descriptor) {
 			of := oneofField{
 				fieldCommon: fieldCommon{
 					goName:     fname,
-					getterName: "Get"+fname,
+					getterName: "Get" + fname,
 					goType:     dname,
 					tags:       tag,
 					protoName:  odp.GetName(),

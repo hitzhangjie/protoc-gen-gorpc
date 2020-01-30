@@ -1,22 +1,34 @@
+{{- $pkgName := .PackageName -}}
+{{- $goPkgOption := "" -}}
+{{- with .FileOptions.go_package -}}
+  {{- $goPkgOption = . -}}
+{{- end -}}
 package main
 
 import (
 	gorpc "github.com/hitzhangjie/go-rpc"
 
-	{{ with .FileOptions.go_package }}
-	pb "{{.}}"
-	{{ else }}
-	pb "{{.PackageName}}"
-	{{ end }}
+    {{ if ne $goPkgOption "" -}}
+   	pb "{{$goPkgOption}}"
+    {{- else -}}
+    pb "{{$pkgName}}"
+	{{- end }}
+
+	_ "go.uber.org/automaxprocs"
 )
 
-{{- $svrName := (index .Services 0).Name }}
-type {{$svrName|title}}ServerImpl struct {}
+{{range $index, $service := .Services}}
+{{- $svrName := $service.Name | camelcase | untitle -}}
+type {{$svrName}}ServiceImpl struct {}
+{{end}}
 
 func main() {
 
-	s := gorpc.NewService()
+	s := gorpc.NewServer()
 
-	pb.Register{{$svrName|title}}Server(s, &{{$svrName|title}}ServerImpl{})
+    {{range $index, $service := .Services}}
+    {{- $svrNameCamelCase := $service.Name | camelcase -}}
+	pb.Register{{$svrNameCamelCase}}Service(s, &{{$svrNameCamelCase|untitle}}ServiceImpl{})
+	{{end}}
 	s.Serve()
 }

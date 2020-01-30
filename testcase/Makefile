@@ -1,9 +1,11 @@
 all: *.proto
-	protoc --gorpc_out=plugins=gorpc:. hello.proto
+	rm -rf hello
+	protoc --gorpc_out=. hello.proto
 
 .PHONY: clean
 
 clean:
+	rm -rf hello
 	rm *.go
 
 
