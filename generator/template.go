@@ -117,20 +117,16 @@ func (g *Generator) procTplFile(inFile, outFile string, nfd *gorpc.FileDescripto
 	}
 	defer fout.Close()
 
-	// fixme refactor this to a new type
-	p := struct {
-		*gorpc.FileDescriptor
-		Protocol     string
-		GoMod        string
-		ServiceIndex int
-	}{
-		nfd,
-		"whisper",
-		"unspecified",
-		0,
-	}
+	p := TemplateParams{nfd, "whisper", "unspecified", 0}
 	if err = instance.Execute(fout, p); err != nil {
 		return err
 	}
 	return nil
+}
+
+type TemplateParams struct {
+	*gorpc.FileDescriptor
+	Protocol     string
+	GoMod        string
+	ServiceIndex int
 }
