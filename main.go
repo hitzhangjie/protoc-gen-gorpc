@@ -60,7 +60,13 @@ import (
 )
 
 func init() {
-	log.SetFlags(log.Lshortfile)
+	log.SetFlags(log.Ltime | log.Lshortfile)
+
+	fout, err := os.OpenFile("/tmp/protoc-gen-gorpc.log", os.O_CREATE|os.O_RDWR, os.FileMode(0666))
+	if err != nil {
+		panic(err)
+	}
+	log.SetOutput(fout)
 }
 
 func main() {
@@ -83,6 +89,12 @@ func main() {
 		g.Fail("no files to generate")
 	}
 
+	// 0. enable `paths=source_relative` by default
+	//p := g.Request.GetParameter()
+	//if len(g.Request.GetParameter()) != 0 {
+	//	p = p + ",paths=source_relatvie,"
+	//	g.Request.Parameter = &p
+	//}
 	g.CommandLineParameters(g.Request.GetParameter())
 
 	// if want to debug this protoc plugin, we'd better let the debugger attach to it before
@@ -105,7 +117,7 @@ func main() {
 	g.SetPackageNames()
 	g.BuildTypeNameMap()
 
-	// 1. 生成*.pb.go文件，删除了grpc插件相关代码逻辑
+	// 1. generate *.pb.go，here the grpc logic is removed
 	g.GenerateAllFiles()
 
 	// Send back the results.
@@ -118,9 +130,10 @@ func main() {
 		g.Error(err, "failed to write output proto")
 	}
 
-	// 2. 生成自定义模板相关文件
+	// 2. process go template files installed in ~/.gorpc/go
 	err = g.GenerateTplFiles()
-	if err != nil  {
-		g.Error(err, "failed to process template files")
+	if err != nil {
+		log.Print("failed to process template files, protofile: %v, err: %v", g.Request.FileToGenerate, err)
 	}
+	log.Printf("protoc-gen-gorpc process template files ok, protofile: %v", g.Request.FileToGenerate)
 }
