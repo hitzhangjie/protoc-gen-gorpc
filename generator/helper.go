@@ -1,12 +1,12 @@
 package gorpc
 
 import (
-	"github.com/golang/protobuf/protoc-gen-go/descriptor"
-	"github.com/golang/protobuf/protoc-gen-go/generator"
+	"github.com/hitzhangjie/protoc-gen-gorpc/descriptor"
+	"github.com/hitzhangjie/protoc-gen-gorpc/generator"
 )
 
-// buildFileDescriptor 构建一个更简单的FileDescriptor对象，指导代码生成
-func buildFileDescriptor(fd *generator.FileDescriptor) (nfd *FileDescriptor, err error) {
+// BuildFileDescriptor 构建一个更简单的FileDescriptor对象，指导代码生成
+func BuildFileDescriptor(fd *generator.FileDescriptor) (nfd *FileDescriptor, err error) {
 
 	opts, err := buildOptions(fd.GetOptions())
 	if err != nil {
