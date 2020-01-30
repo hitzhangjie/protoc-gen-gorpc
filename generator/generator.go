@@ -42,6 +42,7 @@ import (
 	"compress/gzip"
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"go/ast"
 	"go/build"
@@ -51,17 +52,21 @@ import (
 	"log"
 	"os"
 	"path"
+	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
+	"text/template"
 	"unicode"
 	"unicode/utf8"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/protoc-gen-go/generator/internal/remap"
+	"github.com/hitzhangjie/protoc-gen-gorpc/generator/internal/remap"
+	"github.com/hitzhangjie/protoc-gen-gorpc/gorpc"
+	"github.com/hitzhangjie/protoc-gen-gorpc/utils/fs"
 
-	"github.com/golang/protobuf/protoc-gen-go/descriptor"
-	plugin "github.com/golang/protobuf/protoc-gen-go/plugin"
+	"github.com/hitzhangjie/protoc-gen-gorpc/descriptor"
+	plugin "github.com/hitzhangjie/protoc-gen-gorpc/plugin"
 )
 
 // generatedCodeVersion indicates a version of the generated code.
@@ -1117,6 +1122,97 @@ func (g *Generator) runPlugins(file *FileDescriptor) {
 	for _, p := range plugins {
 		p.Generate(file)
 	}
+}
+
+// ProcGoTemplate process the go template files
+func (g *Generator) ProcGoTemplate(file *FileDescriptor) error {
+
+	nfd, err := BuildFileDescriptor(file)
+	if err != nil {
+		return err
+	}
+
+	if len(file.FileDescriptorProto.Service) == 0 {
+		return errors.New("No RPC Service defined")
+	}
+
+	// todo run go template to generate template
+	root := "/Users/zhangjie/Github/protoc-gen-gorpc/install"
+	tmpdir := os.TempDir()
+
+	err = filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+
+		// 检查要不要处理当前文件
+		if err != nil {
+			return err
+		}
+
+		if path == "." || path == ".." {
+			return nil
+		}
+
+		var target string
+
+		// 新生成文件目录结构，与模板路径保持一样的结构
+		if rel, err := filepath.Rel(path, root); err != nil {
+			return err
+		} else {
+			target = filepath.Join(tmpdir, rel)
+		}
+
+		// 如果是文件，且为go模板文件，执行go模板引擎生成新文件
+		if !info.IsDir() {
+
+			// 非模板文件，直接copy
+			if !strings.HasSuffix(path, ".tpl") {
+				fs.Copy(path, target)
+			}
+
+			// 模板文件，执行模板处理引擎
+			if err = g.procTemplateFile(path, target, nfd); err != nil {
+				return err
+			}
+			return nil
+		}
+
+		if err = os.MkdirAll(target, os.ModePerm); err != nil {
+			return err
+		}
+		return nil
+	})
+
+	return err
+}
+
+func (g *Generator) procTemplateFile(inFile, outFile string, nfd *gorpc.FileDescriptor) error {
+
+	baseName := filepath.Base(inFile)
+
+	var (
+		instance *template.Template
+		err      error
+		fout     *os.File
+	)
+
+	if gorpc.FuncMap == nil {
+		instance, err = template.New(baseName).ParseFiles(inFile)
+	} else {
+		instance, err = template.New(baseName).Funcs(gorpc.FuncMap).ParseFiles(inFile)
+	}
+
+	if err != nil {
+		return err
+	}
+
+	if fout, err = os.Create(outFile); err != nil {
+		return err
+	}
+	defer fout.Close()
+
+	if err = instance.Execute(fout, nfd); err != nil {
+		return err
+	}
+	return nil
 }
 
 // Fill the response protocol buffer with the generated output for all the files we're
@@ -2264,7 +2360,7 @@ func (g *Generator) generateMessage(message *Descriptor) {
 			of := oneofField{
 				fieldCommon: fieldCommon{
 					goName:     fname,
-					getterName: "Get"+fname,
+					getterName: "Get" + fname,
 					goType:     dname,
 					tags:       tag,
 					protoName:  odp.GetName(),

@@ -1,3 +1,5 @@
 package gorpc
 
-var funcMap map[string]interface{}
+var FuncMap = map[string]interface{}{
+
+}

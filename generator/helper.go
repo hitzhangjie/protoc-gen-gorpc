@@ -1,35 +1,35 @@
-package gorpc
+package generator
 
 import (
 	"github.com/hitzhangjie/protoc-gen-gorpc/descriptor"
-	"github.com/hitzhangjie/protoc-gen-gorpc/generator"
+	"github.com/hitzhangjie/protoc-gen-gorpc/gorpc"
 )
 
 // BuildFileDescriptor 构建一个更简单的FileDescriptor对象，指导代码生成
-func BuildFileDescriptor(fd *generator.FileDescriptor) (nfd *FileDescriptor, err error) {
+func BuildFileDescriptor(fd *FileDescriptor) (nfd *gorpc.FileDescriptor, err error) {
 
 	opts, err := buildOptions(fd.GetOptions())
 	if err != nil {
 		return nil, err
 	}
 
-	nfd = &FileDescriptor{
+	nfd = &gorpc.FileDescriptor{
 		PackageName:        fd.GetPackage(),
 		Imports:            nil, // fixme
 		FileOptions:        opts,
-		Services:           []*ServiceDescriptor{},
+		Services:           []*gorpc.ServiceDescriptor{},
 		Dependencies:       nil, // fixme
 		ImportPathMappings: nil, // fixme
-		pkgPkgMappings:     nil, // fixme
+		PkgPkgMappings:     nil, // fixme
 	}
 
 	for _, s := range fd.Service {
-		srv := &ServiceDescriptor{
+		srv := &gorpc.ServiceDescriptor{
 			Name: s.GetName(),
-			RPC:  []*RPCDescriptor{},
+			RPC:  []*gorpc.RPCDescriptor{},
 		}
 		for _, m := range s.Method {
-			rpc := &RPCDescriptor{
+			rpc := &gorpc.RPCDescriptor{
 				Name:              m.GetName(),
 				Cmd:               m.GetName(),
 				FullyQualifiedCmd: m.GetName(),

@@ -9,7 +9,7 @@ type FileDescriptor struct {
 
 	Dependencies       map[string]string // 依赖(imported)的pb文件对应的正确包名（考虑了fileoptions如go_package等的影响）
 	ImportPathMappings map[string]string // pb文件package(package diretive)到正确导入路径的关系(考虑了fileoptions如go_package的响应)
-	pkgPkgMappings     map[string]string // pb文件package(package directive)到正确包名的映射关系(考虑了fileoptions如go_package的影响）
+	PkgPkgMappings     map[string]string // pb文件package(package directive)到正确包名的映射关系(考虑了fileoptions如go_package的影响）
 }
 
 // ServiceDescriptor service作用域相关的描述信息
