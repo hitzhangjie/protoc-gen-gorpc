@@ -13,8 +13,6 @@ import (
     {{- else -}}
     pb "{{$pkgName}}"
 	{{- end }}
-
-	_ "go.uber.org/automaxprocs"
 )
 
 {{range $index, $service := .Services}}
