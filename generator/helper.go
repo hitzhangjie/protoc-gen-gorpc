@@ -1,22 +1,24 @@
 package generator
 
 import (
-	"github.com/hitzhangjie/protoc-gen-gorpc/descriptor"
 	"github.com/hitzhangjie/protoc-gen-gorpc/gorpc"
 )
 
-// convertFileDescriptor 构建一个更简单的FileDescriptor对象，指导代码生成
+// convertFileDescriptor convert google/protobuf/.../FileDescriptor to gorpc.FileDescriptor,
+// which is much simpler to reference in go template file.
 func convertFileDescriptor(fd *FileDescriptor) (nfd *gorpc.FileDescriptor, err error) {
 
-	opts, err := buildOptions(fd.GetOptions())
-	if err != nil {
-		return nil, err
+	// package name
+	packageName := fd.GetPackage()
+	if opts := fd.GetOptions(); opts != nil {
+		if v := opts.GetGoPackage(); len(v) != 0 {
+			packageName = v
+		}
 	}
 
 	nfd = &gorpc.FileDescriptor{
-		PackageName:        fd.GetPackage(),
+		PackageName:        packageName,
 		Imports:            nil, // fixme
-		FileOptions:        opts,
 		Services:           []*gorpc.ServiceDescriptor{},
 		Dependencies:       nil, // fixme
 		ImportPathMappings: nil, // fixme
@@ -44,23 +46,4 @@ func convertFileDescriptor(fd *FileDescriptor) (nfd *gorpc.FileDescriptor, err e
 	}
 
 	return nfd, nil
-}
-
-// buildOptions 将常见的影响package名的FileOptions转换为map
-func buildOptions(fopts *descriptor.FileOptions) (map[string]interface{}, error) {
-
-	if fopts == nil {
-		return nil, nil
-	}
-
-	m := map[string]interface{}{}
-
-	if v := fopts.GetGoPackage(); len(v) != 0 {
-		m["go_package"] = v
-	}
-	//if v := fopts.GetJavaPackage(); len(v) != 0 {
-	//	m["java_package"] = v
-	//}
-
-	return m, nil
 }

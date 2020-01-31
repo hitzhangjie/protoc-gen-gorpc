@@ -2702,7 +2702,7 @@ func init() {
 	proto.RegisterType((*EnumValueDescriptorProto)(nil), "google.protobuf.EnumValueDescriptorProto")
 	proto.RegisterType((*ServiceDescriptorProto)(nil), "google.protobuf.ServiceDescriptorProto")
 	proto.RegisterType((*MethodDescriptorProto)(nil), "google.protobuf.MethodDescriptorProto")
-	proto.RegisterType((*FileOptions)(nil), "google.protobuf.FileOptions")
+	proto.RegisterType((*FileOptions)(nil), "google.protobuf.fileOptions")
 	proto.RegisterType((*MessageOptions)(nil), "google.protobuf.MessageOptions")
 	proto.RegisterType((*FieldOptions)(nil), "google.protobuf.FieldOptions")
 	proto.RegisterType((*OneofOptions)(nil), "google.protobuf.OneofOptions")
