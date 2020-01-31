@@ -18,11 +18,11 @@ func convertFileDescriptor(fd *FileDescriptor) (nfd *gorpc.FileDescriptor, err e
 
 	nfd = &gorpc.FileDescriptor{
 		PackageName:        packageName,
-		Imports:            nil, // fixme
 		Services:           []*gorpc.ServiceDescriptor{},
 		Dependencies:       nil, // fixme
 		ImportPathMappings: nil, // fixme
 		PkgPkgMappings:     nil, // fixme
+		Imports:            nil, // fixme
 	}
 
 	for _, s := range fd.Service {
@@ -35,8 +35,8 @@ func convertFileDescriptor(fd *FileDescriptor) (nfd *gorpc.FileDescriptor, err e
 				Name:              m.GetName(),
 				Cmd:               m.GetName(),
 				FullyQualifiedCmd: m.GetName(),
-				RequestType:       m.GetInputType(),
-				ResponseType:      m.GetOutputType(),
+				RequestType:       m.GetInputType()[1:],
+				ResponseType:      m.GetOutputType()[1:],
 				LeadingComments:   "", // fixme
 				TrailingComments:  "", // fixme
 			}
