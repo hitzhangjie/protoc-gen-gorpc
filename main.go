@@ -57,6 +57,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/hitzhangjie/protoc-gen-gorpc/generator"
+	"github.com/hitzhangjie/protoc-gen-gorpc/utils/gofmt"
 )
 
 func init() {
@@ -133,7 +134,16 @@ func main() {
 	// 2. process go template files installed in ~/.gorpc/go
 	err = g.GenerateTplFiles()
 	if err != nil {
-		log.Print("failed to process template files, protofile: %v, err: %v", g.Request.FileToGenerate, err)
+		log.Printf("failed to process template files, err: %v", err)
 	}
-	log.Printf("protoc-gen-gorpc process template files ok, protofile: %v", g.Request.FileToGenerate)
+
+	dir, err := g.GetOutputDirectory()
+	if err != nil {
+		log.Printf("failed to get output directory, err: %v", err)
+	}
+
+	err = gofmt.GoFormatDirectory(dir)
+	if err != nil  {
+		log.Printf("failed to gofmt directory, err: %v", err)
+	}
 }

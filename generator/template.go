@@ -2,6 +2,7 @@ package generator
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -13,12 +14,36 @@ import (
 
 // GenerateTplFiles run go template engine to process template files
 func (g *Generator) GenerateTplFiles() error {
+
+	if len(g.allFiles) != 1 {
+		return fmt.Errorf("only 1 *.proto is support, you specify %d", len(g.allFiles))
+	}
+
 	for _, file := range g.allFiles {
 		if err := g.generateTplFile(file); err != nil {
 			return err
 		}
 	}
 	return nil
+}
+
+// GetOutputDirectory get the output directory of code generation for current *.proto
+func (g *Generator) GetOutputDirectory() (string, error) {
+	if len(g.allFiles) != 1 {
+		return "", fmt.Errorf("only 1 *.proto is support, you specify %d", len(g.allFiles))
+	}
+
+	wd, err := os.Getwd()
+	if err != nil {
+		return "", err
+	}
+
+	file := g.allFiles[0]
+	baseName := filepath.Base(file.GetName())
+	fileName := strings.TrimSuffix(baseName, filepath.Ext(baseName))
+	output := filepath.Join(wd, fileName)
+
+	return output, nil
 }
 
 // generateTplFile process the go template files
@@ -41,14 +66,10 @@ func (g *Generator) generateTplFile(file *FileDescriptor) error {
 	}
 	root := filepath.Join(home, ".gorpc2/go")
 
-	wd, err := os.Getwd()
+	output, err := g.GetOutputDirectory()
 	if err != nil {
 		return err
 	}
-
-	baseName := filepath.Base(file.GetName())
-	fileName := strings.TrimSuffix(baseName, filepath.Ext(baseName))
-	output := filepath.Join(wd, fileName)
 	os.MkdirAll(output, os.ModePerm)
 
 	fn := func(path string, info os.FileInfo, err error) error {
