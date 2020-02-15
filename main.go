@@ -57,7 +57,6 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/hitzhangjie/protoc-gen-gorpc/generator"
-	"github.com/hitzhangjie/protoc-gen-gorpc/utils/gofmt"
 )
 
 func init() {
@@ -149,7 +148,23 @@ func main() {
 		)
 	*/
 
-	// Send back the results.
+	// 2. process go template files installed in ~/.gorpc/go
+	err = g.GenerateTplFiles()
+	if err != nil {
+		log.Printf("failed to process template files, err: %v", err)
+	}
+
+	//dir, err := g.GetOutputDirectory()
+	//if err != nil {
+	//	log.Printf("failed to get output directory, err: %v", err)
+	//}
+
+	//err = gofmt.GoFormatDirectory(dir)
+	//if err != nil {
+	//	log.Printf("failed to gofmt directory, err: %v", err)
+	//}
+
+	// 3. Send back the results.
 	data, err = proto.Marshal(g.Response)
 	if err != nil {
 		g.Error(err, "failed to marshal output proto")
@@ -159,19 +174,4 @@ func main() {
 		g.Error(err, "failed to write output proto")
 	}
 
-	// 2. process go template files installed in ~/.gorpc/go
-	err = g.GenerateTplFiles()
-	if err != nil {
-		log.Printf("failed to process template files, err: %v", err)
-	}
-
-	dir, err := g.GetOutputDirectory()
-	if err != nil {
-		log.Printf("failed to get output directory, err: %v", err)
-	}
-
-	err = gofmt.GoFormatDirectory(dir)
-	if err != nil {
-		log.Printf("failed to gofmt directory, err: %v", err)
-	}
 }
