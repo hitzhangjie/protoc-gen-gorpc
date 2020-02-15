@@ -1,6 +1,7 @@
 package generator
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"os"
@@ -8,7 +9,9 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/golang/protobuf/proto"
 	"github.com/hitzhangjie/protoc-gen-gorpc/gorpc"
+	plugin "github.com/hitzhangjie/protoc-gen-gorpc/plugin"
 	"github.com/hitzhangjie/protoc-gen-gorpc/utils/fs"
 )
 
@@ -120,7 +123,6 @@ func (g *Generator) procTplFile(inFile, outFile string, nfd *gorpc.FileDescripto
 	var (
 		instance *template.Template
 		err      error
-		fout     *os.File
 	)
 
 	if gorpc.FuncMap == nil {
@@ -133,15 +135,19 @@ func (g *Generator) procTplFile(inFile, outFile string, nfd *gorpc.FileDescripto
 		return err
 	}
 
-	if fout, err = os.Create(outFile); err != nil {
-		return err
-	}
-	defer fout.Close()
+	dat := make([]byte, 4096)
+	buf := bytes.NewBuffer(dat)
 
 	p := TemplateParams{nfd, "whisper", "unspecified", 0}
-	if err = instance.Execute(fout, p); err != nil {
+	if err = instance.Execute(buf, p); err != nil {
 		return err
 	}
+
+	g.Response.File = append(g.Response.File, &plugin.CodeGeneratorResponse_File{
+		Name:    proto.String(inFile),
+		Content: proto.String(buf.String()),
+	})
+
 	return nil
 }
 
