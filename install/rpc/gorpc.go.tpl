@@ -41,19 +41,19 @@ import (
 // {{$svrNameCamelCase}}Service defines service
 type {{$svrNameCamelCase}}Service interface {
 
-	{{ range $rpc := $service.RPC }}
-	{{- $rpcName := .Name | camelcase -}}
-	{{- $rpcReqType := (simplify (gofulltype .RequestType $.FileDescriptor) $pkgName)|export }}
-	{{- $rpcRspType := (simplify (gofulltype .ResponseType $.FileDescriptor) $pkgName)|export }}
+	{{ range $index, $method := $service.RPC }}
+	{{- $rpcName := $method.Name | camelcase -}}
+    {{- $rpcReqType := $method.RequestType -}}
+    {{- $rpcRspType := $method.ResponseType -}}
 	{{ with .LeadingComments }}// {{$rpcName}} {{.}}{{ end }}
 	{{$rpcName}}(ctx context.Context, req *{{$rpcReqType}},rsp *{{$rpcRspType}}) (err error) {{ with .TrailingComments}}// {{.}}{{ end }}
 {{ end -}}
 }
 
-{{range $service.RPC -}}
-{{- $rpcName := .Name | camelcase -}}
-{{- $rpcReqType := (simplify (gofulltype .RequestType $.FileDescriptor) $pkgName)|export }}
-{{- $rpcRspType := (simplify (gofulltype .ResponseType $.FileDescriptor) $pkgName)|export }}
+{{range $index, $method := $service.RPC -}}
+{{- $rpcName := $method.Name | camelcase -}}
+{{- $rpcReqType := $method.RequestType -}}
+{{- $rpcRspType := $method.ResponseType -}}
 func {{$svrNameCamelCase}}Service_{{$rpcName}}_Handler(svr interface{}, ctx context.Context, f server.FilterFunc) (rspbody interface{}, err error) {
 
     req := &{{$rpcReqType}}{}
@@ -102,9 +102,9 @@ func Register{{$svrNameCamelCase}}Service(s server.Service, svr {{$svrNameCamelC
 // {{$svrNameCamelCase}}ClientProxy defines service client proxy
 type {{$svrNameCamelCase}}ClientProxy interface {
 	{{ range $rpc := $service.RPC}}
-	{{- $rpcName := .Name | camelcase -}}
-	{{- $rpcReqType := (simplify (gofulltype .RequestType $.FileDescriptor) $pkgName)|export }}
-   	{{- $rpcRspType := (simplify (gofulltype .ResponseType $.FileDescriptor) $pkgName)|export }}
+   	{{- $rpcName := .Name | camelcase -}}
+    {{- $rpcReqType := $rpc.RequestType -}}
+    {{- $rpcRspType := $rpc.ResponseType -}}
    	{{ with .LeadingComments }}// {{$rpcName}} {{.}}{{ end }}
 	{{$rpcName}}(ctx context.Context, req *{{$rpcReqType}}, opts ...client.Option) (rsp *{{$rpcRspType}}, err error) {{ with .TrailingComments }}// {{.}}{{ end }}
 {{ end -}}
@@ -119,15 +119,15 @@ func New{{$svrNameCamelCase}}ClientProxy(opts...client.Option) {{$svrNameCamelCa
 	return &{{$svrNameCamelCase|untitle}}ClientProxyImpl {client: client.DefaultClient, opts: opts}
 }
 
-{{range $idx, $rpc := $service.RPC}}
-{{- $rpcName := .Name | camelcase -}}
-{{- $rpcReqType := (simplify (gofulltype .RequestType $.FileDescriptor) $pkgName)|export }}
-{{- $rpcRspType := (simplify (gofulltype .ResponseType $.FileDescriptor) $pkgName)|export }}
+{{range $index, $method := $service.RPC}}
+{{- $rpcName := $method.Name | camelcase -}}
+{{- $rpcReqType := $method.RequestType -}}
+{{- $rpcRspType := $method.ResponseType -}}
 func (c *{{$svrNameCamelCase|untitle}}ClientProxyImpl) {{$rpcName}}(ctx context.Context, req *{{$rpcReqType}}, opts ...client.Option) (rsp *{{$rpcRspType}}, err error) {
 
 	ctx, msg := codec.WithCloneMessage(ctx)
 
-	msg.WithClientRPCName({{$svrNameCamelCase}}Server_ServiceDesc.Methods[{{$idx}}].Name)
+	msg.WithClientRPCName({{$svrNameCamelCase}}Server_ServiceDesc.Methods[{{$index}}].Name)
 	msg.WithCalleeServiceName({{$svrNameCamelCase}}Server_ServiceDesc.ServiceName)
 
 	callopts := make([]client.Option, 0, len(c.opts)+len(opts))
