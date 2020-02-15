@@ -80,22 +80,10 @@ func init() {
    	{{$svrNameCamelCase|untitle}}ClientProxy = pb.New{{$svrNameCamelCase}}ClientProxy(opts...)
 }
 
-{{range (index .Services .ServiceIndex).RPC}}
-{{- $rpcName := .Name | camelcase -}}
-{{- $rpcReqType := .RequestType -}}
-{{- $rpcRspType := .ResponseType -}}
-
-{{- if or (eq (trimright "." $rpcReqType|gopkg) ($pkgName|gopkg)) (eq (trimright "." (gofulltype $rpcReqType $.FileDescriptor)|gopkg) ($goPkgOption|gopkg)) -}}
-	{{- $rpcReqType = (printf "pb.%s" (splitList "." $rpcReqType|last|export)) -}}
-{{- else -}}
-	{{- $rpcReqType = (gofulltype $rpcReqType $.FileDescriptor) -}}
-{{- end -}}
-
-{{- if or (eq (trimright "." $rpcRspType|gopkg) ($pkgName|gopkg)) (eq (trimright "." (gofulltype $rpcRspType $.FileDescriptor)|gopkg) ($goPkgOption|gopkg)) -}}
-	{{- $rpcRspType = (printf "pb.%s" (splitList "." $rpcRspType|last|export)) -}}
-{{- else -}}
-	{{- $rpcRspType = (gofulltype $rpcRspType $.FileDescriptor) -}}
-{{- end -}}
+{{range $index, $method := (index .Services .ServiceIndex).RPC}}
+{{- $rpcName := $method.Name | camelcase -}}
+{{- $rpcReqType := $method.RequestType -}}
+{{- $rpcRspType := $method.ResponseType -}}
 
 func Test_{{$svrNameCamelCase}}_{{$rpcName}}(t *testing.T) {
 	ctx := context.TODO()
