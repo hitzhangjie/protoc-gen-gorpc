@@ -5,7 +5,6 @@ all: *.proto
 .PHONY: clean
 
 clean:
-	rm -rf hello
-	rm *.go
+	rm -rf hello rpc *.yaml go.mod *.go
 
 

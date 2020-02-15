@@ -57,7 +57,6 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/hitzhangjie/protoc-gen-gorpc/generator"
-	"github.com/hitzhangjie/protoc-gen-gorpc/utils/gofmt"
 )
 
 func init() {
@@ -121,7 +120,51 @@ func main() {
 	// 1. generate *.pb.go，here the grpc logic is removed
 	g.GenerateAllFiles()
 
-	// Send back the results.
+	/*
+		fin, err := os.Open("testdir/helloworld.txt")
+		if err != nil {
+			panic(err)
+		}
+		dat, err := ioutil.ReadAll(fin)
+		if err != nil {
+			panic(err)
+		}
+		if strings.Contains(string(dat), "@@protoc_insertion_point") {
+			g.Response.File = append(g.Response.File, &plugin.CodeGeneratorResponse_File{
+				Name:    proto.String("testdir/helloworld.txt"),
+				Content: proto.String(string(dat)),
+			})
+		}
+		g.Response.File = append(g.Response.File, []*plugin.CodeGeneratorResponse_File{
+			{
+				Name:           proto.String("testdir/helloworld.txt"),
+				Content:        proto.String("this is a hello world message --- 111"),
+				InsertionPoint: proto.String("HERE"),
+			}, {
+				Name:           proto.String("testdir/helloworld.txt"),
+				Content:        proto.String("this is a hello world message --- 222"),
+				InsertionPoint: proto.String("HERE2"),
+			}}...
+		)
+	*/
+
+	// 2. process go template files installed in ~/.gorpc/go
+	err = g.GenerateTplFiles()
+	if err != nil {
+		log.Printf("failed to process template files, err: %v", err)
+	}
+
+	//dir, err := g.GetOutputDirectory()
+	//if err != nil {
+	//	log.Printf("failed to get output directory, err: %v", err)
+	//}
+
+	//err = gofmt.GoFormatDirectory(dir)
+	//if err != nil {
+	//	log.Printf("failed to gofmt directory, err: %v", err)
+	//}
+
+	// 3. Send back the results.
 	data, err = proto.Marshal(g.Response)
 	if err != nil {
 		g.Error(err, "failed to marshal output proto")
@@ -131,19 +174,4 @@ func main() {
 		g.Error(err, "failed to write output proto")
 	}
 
-	// 2. process go template files installed in ~/.gorpc/go
-	err = g.GenerateTplFiles()
-	if err != nil {
-		log.Printf("failed to process template files, err: %v", err)
-	}
-
-	dir, err := g.GetOutputDirectory()
-	if err != nil {
-		log.Printf("failed to get output directory, err: %v", err)
-	}
-
-	err = gofmt.GoFormatDirectory(dir)
-	if err != nil  {
-		log.Printf("failed to gofmt directory, err: %v", err)
-	}
 }
