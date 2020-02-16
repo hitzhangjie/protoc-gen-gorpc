@@ -117,10 +117,12 @@ func main() {
 	g.SetPackageNames()
 	g.BuildTypeNameMap()
 
+	//============================================================
 	// 1. generate *.pb.go，here the grpc logic is removed
 	g.GenerateAllFiles()
 
-	// 2. process go template files installed in ~/.gorpc/go
+	//============================================================
+	// 2. process go template files registered in gotpl.GoRPCTemplates
 	err = g.GenerateTplFiles()
 	if err != nil {
 		log.Printf("failed to process template files, err: %v", err)

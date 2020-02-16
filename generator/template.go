@@ -17,10 +17,6 @@ import (
 // GenerateTplFiles run go template engine to process template files
 func (g *Generator) GenerateTplFiles() error {
 
-	if len(g.allFiles) != 1 {
-		return fmt.Errorf("only 1 *.proto is support, you specify %d", len(g.allFiles))
-	}
-
 	for _, file := range g.allFiles {
 		if err := g.generateTplFile(file); err != nil {
 			return err
