@@ -57,6 +57,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/hitzhangjie/protoc-gen-gorpc/generator"
+	"github.com/hitzhangjie/protoc-gen-gorpc/utils/gofmt"
 )
 
 func init() {
@@ -119,24 +120,26 @@ func main() {
 
 	//============================================================
 	// 1. generate *.pb.go，here the grpc logic is removed
+
 	g.GenerateAllFiles()
 
 	//============================================================
 	// 2. process go template files registered in gotpl.GoRPCTemplates
+
 	err = g.GenerateTplFiles()
 	if err != nil {
 		log.Printf("failed to process template files, err: %v", err)
 	}
 
-	//dir, err := g.GetOutputDirectory()
-	//if err != nil {
-	//	log.Printf("failed to get output directory, err: %v", err)
-	//}
+	dir, err := g.GetOutputDirectory()
+	if err != nil {
+		log.Printf("failed to get output directory: %v", err)
+	}
 
-	//err = gofmt.GoFormatDirectory(dir)
-	//if err != nil {
-	//	log.Printf("failed to gofmt directory, err: %v", err)
-	//}
+	err = gofmt.GoFormatDirectory(dir)
+	if err != nil {
+		log.Printf("failed to gofmt directory, err: %v", err)
+	}
 
 	// 3. Send back the results.
 	data, err = proto.Marshal(g.Response)
