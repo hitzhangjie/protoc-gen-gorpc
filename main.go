@@ -72,6 +72,9 @@ func init() {
 
 func main() {
 
+	//============================================================
+	// 0. prepare the generator
+
 	// Begin by allocating a generator. The request and response structures are stored there
 	// so we can do error handling easily - the response structure contains the field to
 	// report failure.
@@ -135,7 +138,9 @@ func main() {
 		log.Printf("failed to gofmt directory, err: %v", err)
 	}
 
+	//============================================================
 	// 3. Send back the results.
+
 	data, err = proto.Marshal(g.Response)
 	if err != nil {
 		g.Error(err, "failed to marshal output proto")
