@@ -4,9 +4,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"os"
-	"path/filepath"
-	"strings"
 	"text/template"
 
 	"github.com/golang/protobuf/proto"
@@ -25,25 +22,6 @@ func (g *Generator) GenerateTplFiles() error {
 		}
 	}
 	return nil
-}
-
-// GetOutputDirectory get the output directory of code generation for current *.proto
-func (g *Generator) GetOutputDirectory() (string, error) {
-	if len(g.allFiles) != 1 {
-		return "", fmt.Errorf("only 1 *.proto is support, you specify %d", len(g.allFiles))
-	}
-
-	wd, err := os.Getwd()
-	if err != nil {
-		return "", err
-	}
-
-	file := g.allFiles[0]
-	baseName := filepath.Base(file.GetName())
-	fileName := strings.TrimSuffix(baseName, filepath.Ext(baseName))
-	output := filepath.Join(wd, fileName)
-
-	return output, nil
 }
 
 // generateTplFile process the go template files

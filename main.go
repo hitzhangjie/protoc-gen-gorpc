@@ -128,10 +128,11 @@ func main() {
 		log.Printf("failed to process template files, err: %v", err)
 	}
 
-	dir, err := g.GetOutputDirectory()
+	dir, err := os.Getwd()
 	if err != nil {
-		log.Printf("failed to get output directory: %v", err)
+		log.Printf("failed to get current directory: %v", err)
 	}
+	log.Printf("current directory: %s", dir)
 
 	err = gofmt.GoFormatDirectory(dir)
 	if err != nil {
