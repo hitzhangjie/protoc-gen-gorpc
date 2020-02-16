@@ -1,10 +1,9 @@
 all: *.proto
-	#protoc --gorpc_out=paths=source_relative:. hello.proto
 	protoc --gorpc_out=. hello.proto
 
 .PHONY: clean
 
 clean:
-	rm -rf *.go *.mod rpc/
+	rm -rf *.go *.mod github.com/
 
 

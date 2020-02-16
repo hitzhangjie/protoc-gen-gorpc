@@ -11,6 +11,8 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/hitzhangjie/protoc-gen-gorpc/gorpc"
+	"github.com/hitzhangjie/protoc-gen-gorpc/gorpc/gotpl"
+	"github.com/hitzhangjie/protoc-gen-gorpc/gorpc/gotpl/rpc"
 	plugin "github.com/hitzhangjie/protoc-gen-gorpc/plugin"
 )
 
@@ -58,7 +60,17 @@ func (g *Generator) generateTplFile(file *FileDescriptor) error {
 	}
 
 	// 处理各模板文件
-	for fp, tpl := range gorpc.GoRPCTemplates {
+	tpls := map[string]string{
+		"main.go":             gotpl.MainGo,
+		"service_rpc.go":      gotpl.ServiceRPCGo,
+		"service_rpc_test.go": gotpl.ServiceRPCTestGo,
+		"go.mod":              gotpl.GoModGo,
+	}
+
+	tpls[fmt.Sprintf("%s/go.mod", nfd.PackageName)] = rpc.GoModGo
+	tpls[fmt.Sprintf("%s/gorpc.go", nfd.PackageName)] = rpc.GoRPCGo
+
+	for fp, tpl := range tpls {
 		err := g.procTplFile(fp, tpl, nfd)
 		if err != nil {
 			return err
