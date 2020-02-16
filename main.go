@@ -90,12 +90,6 @@ func main() {
 		g.Fail("no files to generate")
 	}
 
-	// 0. enable `paths=source_relative` by default
-	//p := g.Request.GetParameter()
-	//if len(g.Request.GetParameter()) != 0 {
-	//	p = p + ",paths=source_relatvie,"
-	//	g.Request.Parameter = &p
-	//}
 	g.CommandLineParameters(g.Request.GetParameter())
 
 	// if want to debug this protoc plugin, we'd better let the debugger attach to it before
