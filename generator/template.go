@@ -11,6 +11,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/hitzhangjie/protoc-gen-gorpc/gorpc"
+	"github.com/hitzhangjie/protoc-gen-gorpc/gorpc/gotpl"
 	plugin "github.com/hitzhangjie/protoc-gen-gorpc/plugin"
 )
 
@@ -57,50 +58,19 @@ func (g *Generator) generateTplFile(file *FileDescriptor) error {
 		return err
 	}
 
-	// run go template to generate template
-	home, err := os.UserHomeDir()
-	if err != nil {
-		return err
-	}
-	root := filepath.Join(home, ".gorpc2/go")
-
-	output, err := g.GetOutputDirectory()
-	if err != nil {
-		return err
-	}
-	os.MkdirAll(output, os.ModePerm)
-
-	fn := func(path string, info os.FileInfo, err error) error {
-		// 检查要不要处理当前文件
+	// 处理各模板文件
+	for fp, tpl := range gotpl.GoRPCTemplates {
+		err := g.procTplFile(fp, tpl, nfd)
 		if err != nil {
 			return err
 		}
-
-		if info.IsDir() {
-			return nil
-		}
-
-		// 新生成文件目录结构，与模板路径保持一样的结构
-		rel, err := filepath.Rel(root, path)
-		if err != nil {
-			return err
-		}
-
-		// 如果是文件，且为go模板文件，执行go模板引擎生成新文件
-		// - 模板文件，执行模板处理引擎
-		//target = filepath.Join(output, strings.TrimSuffix(rel, ".tpl"))
-		target := strings.TrimSuffix(rel, ".tpl")
-		return g.procTplFile(path, target, nfd)
 	}
-
-	return filepath.Walk(root, fn)
+	return nil
 }
 
-func (g *Generator) procTplFile(inFile, outFile string, nfd *gorpc.FileDescriptor) error {
+func (g *Generator) procTplFile(tplFileName, tplFileContent string, nfd *gorpc.FileDescriptor) error {
 
-	baseName := filepath.Base(inFile)
-
-	instance, err := template.New(baseName).Funcs(gorpc.FuncMap).ParseFiles(inFile)
+	instance, err := template.New(tplFileName).Funcs(gorpc.FuncMap).Parse(tplFileContent)
 	if err != nil {
 		return err
 	}
@@ -112,7 +82,7 @@ func (g *Generator) procTplFile(inFile, outFile string, nfd *gorpc.FileDescripto
 	}
 
 	g.Response.File = append(g.Response.File, &plugin.CodeGeneratorResponse_File{
-		Name:    proto.String(outFile),
+		Name:    proto.String(tplFileName),
 		Content: proto.String(buf.String()),
 	})
 
