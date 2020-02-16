@@ -52,12 +52,12 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"os/exec"
 	"runtime"
 	"strconv"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/hitzhangjie/protoc-gen-gorpc/generator"
-	"github.com/hitzhangjie/protoc-gen-gorpc/gorpc/utils/gofmt"
 )
 
 func init() {
@@ -132,11 +132,10 @@ func main() {
 	if err != nil {
 		log.Printf("failed to get current directory: %v", err)
 	}
-	log.Printf("current directory: %s", dir)
 
-	err = gofmt.GoFormatDirectory(dir)
-	if err != nil {
-		log.Printf("failed to gofmt directory, err: %v", err)
+	cmd := exec.Command("go", "fmt", dir)
+	if info, err := cmd.CombinedOutput(); err != nil {
+		log.Printf("failed to gofmt directory, err: %v, info: %s", err, string(info))
 	}
 
 	//============================================================
