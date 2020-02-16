@@ -1,5 +1,6 @@
 all: *.proto
-	protoc --gorpc_out=paths=source_relative:. hello.proto
+	#protoc --gorpc_out=paths=source_relative:. hello.proto
+	protoc --gorpc_out=. hello.proto
 
 .PHONY: clean
 
