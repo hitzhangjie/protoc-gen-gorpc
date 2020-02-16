@@ -1,4 +1,6 @@
-{{- $pkgName := .PackageName -}}
+package gotpl
+
+var ServiceRPCGo = `{{- $pkgName := .PackageName -}}
 {{- $imports := .Imports -}}
 package main
 
@@ -27,4 +29,4 @@ func (s *{{$serviceName}}ServiceImpl) {{$rpcName}}(ctx context.Context, req *{{$
 	return
 }
 
-{{end}}
+{{end}}`

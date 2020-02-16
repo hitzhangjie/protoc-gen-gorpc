@@ -1,4 +1,6 @@
-{{- $svrNameCamelCase := (index .Services .ServiceIndex).Name | camelcase -}}
+package gotpl
+
+var ServiceRPCTestGo = `{{- $svrNameCamelCase := (index .Services .ServiceIndex).Name | camelcase -}}
 {{- $pkgName := .PackageName -}}
 
 {{- $serviceIndex := .ServiceIndex -}}
@@ -102,4 +104,4 @@ func Test_{{$svrNameCamelCase}}_{{$rpcName}}(t *testing.T) {
 	}
 }
 
-{{end}}
+{{end}}`

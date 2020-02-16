@@ -1,4 +1,6 @@
-{{- $pkgName := .PackageName -}}
+package gotpl
+
+var GoModGo=`{{- $pkgName := .PackageName -}}
 {{- $svrName := (index .Services 0).Name -}}
 
 {{- if eq .GoMod "" -}}
@@ -30,4 +32,4 @@ replace {{$v}} => ./stub/{{$rpcdir}}/{{$v}}
 {{ end }}
 
 {{ end }}
-{{ end }}
+{{ end }}`

@@ -1,4 +1,6 @@
-{{- $pkgName := .PackageName -}}
+package gotpl
+
+var MainGo = `{{- $pkgName := .PackageName -}}
 package main
 
 import (
@@ -21,4 +23,4 @@ func main() {
 	pb.Register{{$svrNameCamelCase}}Service(s, &{{$svrNameCamelCase|untitle}}ServiceImpl{})
 	{{end}}
 	s.Serve()
-}
+}`
