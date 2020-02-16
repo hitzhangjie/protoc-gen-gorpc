@@ -120,34 +120,6 @@ func main() {
 	// 1. generate *.pb.go，here the grpc logic is removed
 	g.GenerateAllFiles()
 
-	/*
-		fin, err := os.Open("testdir/helloworld.txt")
-		if err != nil {
-			panic(err)
-		}
-		dat, err := ioutil.ReadAll(fin)
-		if err != nil {
-			panic(err)
-		}
-		if strings.Contains(string(dat), "@@protoc_insertion_point") {
-			g.Response.File = append(g.Response.File, &plugin.CodeGeneratorResponse_File{
-				Name:    proto.String("testdir/helloworld.txt"),
-				Content: proto.String(string(dat)),
-			})
-		}
-		g.Response.File = append(g.Response.File, []*plugin.CodeGeneratorResponse_File{
-			{
-				Name:           proto.String("testdir/helloworld.txt"),
-				Content:        proto.String("this is a hello world message --- 111"),
-				InsertionPoint: proto.String("HERE"),
-			}, {
-				Name:           proto.String("testdir/helloworld.txt"),
-				Content:        proto.String("this is a hello world message --- 222"),
-				InsertionPoint: proto.String("HERE2"),
-			}}...
-		)
-	*/
-
 	// 2. process go template files installed in ~/.gorpc/go
 	err = g.GenerateTplFiles()
 	if err != nil {
