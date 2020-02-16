@@ -11,7 +11,6 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/hitzhangjie/protoc-gen-gorpc/gorpc"
-	"github.com/hitzhangjie/protoc-gen-gorpc/gorpc/gotpl"
 	plugin "github.com/hitzhangjie/protoc-gen-gorpc/plugin"
 )
 
@@ -59,7 +58,7 @@ func (g *Generator) generateTplFile(file *FileDescriptor) error {
 	}
 
 	// 处理各模板文件
-	for fp, tpl := range gotpl.GoRPCTemplates {
+	for fp, tpl := range gorpc.GoRPCTemplates {
 		err := g.procTplFile(fp, tpl, nfd)
 		if err != nil {
 			return err
