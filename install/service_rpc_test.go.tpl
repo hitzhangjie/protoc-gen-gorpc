@@ -1,10 +1,5 @@
 {{- $svrNameCamelCase := (index .Services .ServiceIndex).Name | camelcase -}}
 {{- $pkgName := .PackageName -}}
-{{- $goPkgOption := "" -}}
-
-{{- with .FileOptions.go_package -}}
-{{- $goPkgOption = . -}}
-{{- end -}}
 
 {{- $serviceIndex := .ServiceIndex -}}
 {{ $service := (index .Services .ServiceIndex) -}}
@@ -23,18 +18,14 @@ import (
 	"github.com/hitzhangjie/go-rpc/client"
 	_ "github.com/hitzhangjie/go-rpc/http"
 
-    {{ if ne $goPkgOption "" -}}
-	pb "{{$goPkgOption}}"
-    {{- else -}}
 	pb "{{$pkgName}}"
-    {{- end }}
+
     {{ range .Imports }}
     {{ if ne . $pkgName }}
 	"{{- . -}}"
 	{{ end }}
     {{- end }}
 )
-
 
 var (
 	{{$svrNameCamelCase|untitle}}ClientProxy pb.{{$svrNameCamelCase}}ClientProxy

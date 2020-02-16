@@ -1,11 +1,6 @@
 {{- $pkgName := .PackageName -}}
 {{- $svrName := (index .Services 0).Name -}}
 
-{{- $goPkgOption := "" -}}
-{{- with .FileOptions.go_package -}}
-  {{- $goPkgOption = . -}}
-{{- end -}}
-
 {{- if eq .GoMod "" -}}
 module gorpc.app.{{$svrName}}
 {{- else -}}
@@ -14,12 +9,7 @@ module {{.GoMod}}
 
 go 1.12
 
-{{ $rpcdir := "" -}}
-{{ if ne $goPkgOption "" -}}
-{{ $rpcdir = $goPkgOption }}
-{{- else -}}
-{{ $rpcdir = $pkgName }}
-{{- end -}}
+{{ $rpcdir := $pkgName }}
 replace {{$rpcdir}} => ./stub/{{$rpcdir}}
 
 {{ range $k, $v := .Pb2ImportPath -}}
@@ -41,4 +31,3 @@ replace {{$v}} => ./stub/{{$rpcdir}}/{{$v}}
 
 {{ end }}
 {{ end }}
-

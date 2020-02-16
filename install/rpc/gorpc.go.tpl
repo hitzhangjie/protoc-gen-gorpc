@@ -2,15 +2,7 @@
 // source: {{.ProtoFile}}
 
 {{ $pkgName := .PackageName -}}
-{{- $goPkgOption := "" -}}
-{{- with .FileOptions.go_package -}}
-  {{- $goPkgOption = . -}}
-{{- end -}}
-{{- if ne $goPkgOption "" -}}
-package {{ (splitList "/" $goPkgOption)|last|gopkg}}
-{{- else -}}
-package {{ $pkgName|gopkg }}
-{{- end }}
+package {{ $pkgName }}
 
 import (
 	"context"
@@ -27,7 +19,7 @@ import (
     "github.com/hitzhangjie/go-rpc/codec"
 
     {{ range .Imports }}
-    {{ if and (ne $pkgName .) (ne $goPkgOption .) }}
+    {{ if ne . $pkgName }}
     "{{ . }}"
     {{ end }}
     {{ end }}
