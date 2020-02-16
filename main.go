@@ -57,7 +57,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/hitzhangjie/protoc-gen-gorpc/generator"
-	"github.com/hitzhangjie/protoc-gen-gorpc/utils/gofmt"
+	"github.com/hitzhangjie/protoc-gen-gorpc/gorpc/utils/gofmt"
 )
 
 func init() {

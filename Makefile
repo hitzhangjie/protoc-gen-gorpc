@@ -1,4 +1,4 @@
-all: *.go gorpc/*.go utils/fs/*.go
+all: *.go gorpc/*.go gorpc/utils
 	go build -gcflags="all=-N -l" -o protoc-gen-gorpc
 
 .PHONY: install
