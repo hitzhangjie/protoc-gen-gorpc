@@ -52,7 +52,6 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"os/exec"
 	"runtime"
 	"strconv"
 
@@ -128,15 +127,19 @@ func main() {
 		log.Printf("failed to process template files, err: %v", err)
 	}
 
-	dir, err := os.Getwd()
-	if err != nil {
-		log.Printf("failed to get current directory: %v", err)
-	}
-
-	cmd := exec.Command("go", "fmt", dir)
-	if info, err := cmd.CombinedOutput(); err != nil {
-		log.Printf("failed to gofmt directory, err: %v, info: %s", err, string(info))
-	}
+	//Deprecated: run `go fmt`
+	//
+	//dir, err := os.Getwd()
+	//if err != nil {
+	//	log.Printf("failed to get current directory: %v", err)
+	//}
+	//
+	//cmd := exec.Command("go", "fmt", dir)
+	//info, err := cmd.CombinedOutput()
+	//if err != nil {
+	//	log.Printf("failed to gofmt directory, err: %v, info: %s", err, string(info))
+	//}
+	//log.Printf("run gofmt ok:\n%s", string(info))
 
 	//============================================================
 	// 3. Send back the results.
