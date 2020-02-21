@@ -17,3 +17,7 @@ you can install this plugin by run:
 ```
 go install github.com/hitzhangjie/protoc-gen-gorpc
 ```
+
+## More
+
+please watch `go-rpc` project, it's a simple and beautiful rpc framework written in go.
