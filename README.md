@@ -1,7 +1,7 @@
 # protoc-gen-gorpc
 
 ## Introduction
-protoc-gen-gorpc is a protoc plugin for generating gorpc code
+protoc-gen-gorpc is a protoc plugin for generating [gorpc](https://github.com/hitzhangjie/go-rpc) code.
 
 ## Usage
 how to use this plugin:
