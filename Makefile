@@ -6,8 +6,6 @@ all: *.go gorpc/*.go gorpc/utils
 
 install:
 	go install
-	mkdir ~/.gorpc2 && cp -r ./install ~/.gorpc2/go
 
 uninstall:
 	go clean -i
-	rm -rf ~/.gorpc2
